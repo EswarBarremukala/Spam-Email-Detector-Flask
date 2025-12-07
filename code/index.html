@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spam Filter Dashboard</title>
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
+        
+        /* Main Layout */
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* Top Section: The Detector */
+        .detector-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h2 { text-align: center; color: #333; }
+        
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+
+        /* Result Alert */
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
+        .spam-alert { background-color: #ffebee; color: #c62828; border: 1px solid #ef5350; }
+        .ham-alert { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #66bb6a; }
+
+        /* Bottom Section: The History Lists */
+        .history-section { display: flex; gap: 20px; }
+        .history-col { flex: 1; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        h3 { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .spam-header { color: #c62828; }
+        .ham-header { color: #2e7d32; }
+
+        /* The List Items */
+        .email-item { font-size: 14px; padding: 10px; border-bottom: 1px solid #eee; }
+        .email-item strong { display: block; color: #555; }
+        .email-item span { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="detector-box">
+        <h2>🛡️ Live Spam Detector & Logger</h2>
+        <form action="/predict" method="post">
+            <label>Sender Email ID:</label>
+            <input type="email" name="email_id" placeholder="sender@example.com" required>
+            <label>Message:</label>
+            <textarea name="message" rows="3" placeholder="Paste email content..." required></textarea>
+            <button type="submit">Analyze & Log</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result-box {{ 'spam-alert' if prediction == 'SPAM' else 'ham-alert' }}">
+            Result: {{ prediction }} <br>
+            <small>{{ reason }}</small>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="history-section">
+        
+        <div class="history-col">
+            <h3 class="spam-header">🚫 Recent Spam Detected</h3>
+            {% for item in spam_history %}
+            <div class="email-item">
+                <strong>From: {{ item.email }}</strong>
+                <span>"{{ item.msg }}"</span>
+            </div>
+            {% else %}
+            <p style="text-align:center; color:#ccc;">No spam detected yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="history-col">
+            <h3 class="ham-header">✅ Safe Emails</h3>
+            {% for item in ham_history %}
+            <div class="email-item">
+                <strong>From: {{ item.email }}</strong>
+                <span>"{{ item.msg }}"</span>
+            </div>
+            {% else %}
+            <p style="text-align:center; color:#ccc;">No safe emails yet.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
